@@ -43,7 +43,7 @@ namespace ExpenseTracker
         public static decimal totalOther { get; set; } = 0m;
 
         // Monthly budget limit (default to 1000)
-        public static decimal monthlyLimit { get; set; } = 1000m;
+        public static decimal monthlyLimit { get; set; } = 0m;
 
         static void Main(string[] args) 
         {
@@ -96,9 +96,11 @@ namespace ExpenseTracker
                                 break;
                             case 2:
                                 Console.WriteLine("You have selected: View summary");
+                                Viewsummary();
                                 break;
                             case 3:
                                 Console.WriteLine("You have selected: Set monthly budget");
+                                Setmonthlybudget();
                                 break;
                             case 4:
                                 Console.WriteLine("Exiting the application.");
@@ -111,7 +113,7 @@ namespace ExpenseTracker
                                 break;
                         }
                     }
-                    Console.WriteLine("-------------------------------------------------------------");
+                    //Console.WriteLine("-------------------------------------------------------------");
                 }
                 else
                 {
@@ -164,7 +166,7 @@ namespace ExpenseTracker
                     Console.WriteLine($"You have selected: {categoryInput}");
 
 
-                    Console.WriteLine("Please enter the expense amount (e.g., 123.45):");
+                    Console.Write("Please enter the expense amount (e.g., 123.45):");
                     string input = Console.ReadLine();
                     if (decimal.TryParse(input, out amountInput))
                     {
@@ -188,8 +190,11 @@ namespace ExpenseTracker
                             expenseCount += 1;
                             if (validatedAmount > highestSingleExpense)
                                 highestSingleExpense = validatedAmount;
-                            if (totalExpensesAmount > monthlyLimit)
-                                Console.WriteLine("Warning: You have exceeded your monthly budget limit!");
+                            if (monthlyLimit is not 0)
+                            {
+                                if (totalExpensesAmount > monthlyLimit)
+                                    Console.WriteLine("Warning: You have exceeded your monthly budget limit!");
+                            }
 
                             break; // Exit the loop if the amount is valid
                         }
@@ -197,8 +202,7 @@ namespace ExpenseTracker
                         {
                             Console.WriteLine($"Error: {ex.Message}. Please try again.");
                             Console.WriteLine();
-                            continue; // Re-enter for valid input
-                            
+                            continue; // Re-enter for valid input                            
                         }
                     }
                     else
@@ -263,7 +267,10 @@ namespace ExpenseTracker
                 Console.WriteLine($"Category: {categoryInput}");
                 Console.WriteLine($"Amount: {BudgetRules.FormatCurrency(BudgetRules.ValidateAmount(amountInput))} - Classification: {BudgetRules.ClassifyAmount(BudgetRules.ValidateAmount(amountInput))}");
                 Console.WriteLine($"Date: {DateOnlyInput.ToString("yyyy-MM-dd")}");
-                Console.WriteLine($"Note: {noteInput}");
+                if (!string.IsNullOrWhiteSpace(noteInput))
+                {
+                    Console.WriteLine($"Note: {noteInput}");
+                }
                 Console.WriteLine("-------------------------------------------------------------");
                 Console.WriteLine();
                 while (true)
@@ -291,8 +298,65 @@ namespace ExpenseTracker
 
 
         }
-        
 
+        public static void Viewsummary()
+        {
+            Console.WriteLine(); 
+            Console.WriteLine("============================================================");
+            Console.WriteLine("                          MY BUDGET                         ");
+            Console.WriteLine("                       EXPENSE SUMMARY                      ");
+            Console.WriteLine("============================================================");
+            if (expenseCount > 0)
+            {
+                Console.WriteLine($"Total Count of Expenses: \t{expenseCount}");
+                Console.WriteLine($"Total Overall Spending:  \t{BudgetRules.FormatCurrency(totalExpensesAmount)}");
+                if (monthlyLimit is not 0)
+                {
+                    Console.WriteLine($"Monthly Budget: \t\t{BudgetRules.FormatCurrency(monthlyLimit)}");
+                    if (totalExpensesAmount > monthlyLimit)
+                    {
+                        Console.WriteLine("Total remaining: \t\tYour monthly expenses have exceeded your budget limit!");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Total remaining: \t\t{BudgetRules.FormatCurrency(monthlyLimit - totalExpensesAmount)}");
+                    }
+                    Console.WriteLine($"Budget Status: \t\t\t{BudgetRules.BudgetStatus((monthlyLimit - totalExpensesAmount), monthlyLimit)}");
+                } 
+                Console.WriteLine($"Average: \t\t\t{BudgetRules.FormatCurrency(totalExpensesAmount / expenseCount)}");
+                Console.WriteLine($"Highest Single Expense: \t{BudgetRules.FormatCurrency(highestSingleExpense)}");
+            
+            Console.WriteLine();
+            Console.WriteLine("-------------------------------------------------------------");
+            Console.WriteLine("                      CATEGORY BREAKDOWN                     ");
+            Console.WriteLine("-------------------------------------------------------------");
+            Console.WriteLine($"Food: \t\t\t{BudgetRules.FormatCurrency(totalFood)}");
+            Console.WriteLine($"Transport:\t\t{BudgetRules.FormatCurrency(totalTransport)}");
+            Console.WriteLine($"Utilities:\t\t{BudgetRules.FormatCurrency(totalUtilities)}");
+            Console.WriteLine($"Entertainment:\t\t{BudgetRules.FormatCurrency(totalEntertainment)}");
+            Console.WriteLine($"Other: \t\t\t{BudgetRules.FormatCurrency(totalOther)}");
+            }
+            else
+                Console.WriteLine("No expenses recorded yet."); Console.WriteLine();
+            Console.WriteLine("-------------------------------------------------------------");
+            Console.WriteLine("                          THANK YOU!                         ");
+            Console.WriteLine("=============================================================");
+        }
+        public static void Setmonthlybudget()
+        {
+            while (true)
+            {
+                Console.WriteLine();
+                Console.Write("Enter your budget limit: ");
+                if (decimal.TryParse(Console.ReadLine(), out decimal inputLimit))
+                {
+                    monthlyLimit = inputLimit;
+                    Console.WriteLine($"Monthly budget set to: \t{BudgetRules.FormatCurrency(monthlyLimit)}");
+                    Console.WriteLine($"Budget Status: \t\t{BudgetRules.BudgetStatus((monthlyLimit - totalExpensesAmount), monthlyLimit)}");
+                    break;
+                }
+            }
+        }
     }
 
 
