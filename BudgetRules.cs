@@ -30,11 +30,10 @@ public static class BudgetRules
     /// than zero, or is greater than <see cref="MaxAmount"/>.
     /// </summary>
     public static decimal ValidateAmount(decimal amount)
-    {
-        // TODO: guard clauses + decimal.Round(amount, 2)
+    { 
         if (amount <= 0 || amount > MaxAmount)
         {
-            throw new InvalidExpenseException($"Amount must be greater than zero and cannot exceed {MaxAmount}.");
+            throw new InvalidExpenseException($"Amount must be greater than zero and cannot exceed {MaxAmount}");
         }
         return decimal.Round(amount, 2, MidpointRounding.AwayFromZero);
 
@@ -48,18 +47,23 @@ public static class BudgetRules
     /// </summary>
     public static string ClassifyAmount(decimal amount)
     {
-        // TODO
+
+        if (amount <= 0)
+        {
+            throw new InvalidExpenseException("Amount must be positive");
+        }
+
         switch (amount)
         {
-            case <= 10:
+            case < 10:
                 {
                     return "Micro"; break;
                 }
-            case <= 50:
+            case < 50:
                 {
                     return "Small"; break;
                 }
-            case <= 200:
+            case < 200:
                 {
                     return "Medium"; break;
                 }
@@ -68,7 +72,7 @@ public static class BudgetRules
                     return "Large"; break;
                 }
         }
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 
     /// <summary>
@@ -80,28 +84,20 @@ public static class BudgetRules
     /// </summary> 
     public static string? NormalizeCategory(string? input)
     {
-
-        List<Category> Categories = Category.DefaultCategories;
-
-
-
-        if (string.IsNullOrWhiteSpace(input)) return null;
-
-        string cleanInput = input.Trim().ToLowerInvariant();
-
-        // Use a switch expression to find the matching Category from your list
-        Category? matchedCategory = cleanInput switch
+        if (string.IsNullOrWhiteSpace(input))
         {
-            "1" or "food" or "f"  =>  Categories.FirstOrDefault(c => c.CategoryId == 1),
-            "2" or "transport" or "t"  => Categories.FirstOrDefault(c => c.CategoryId == 2),
-            "3" or "utilities" or "u"  => Categories.FirstOrDefault(c => c.CategoryId == 3),
-            "4" or "entertainment" or "e"  => Categories.FirstOrDefault(c => c.CategoryId == 4),
-            "5" or "other" or "o"  => Categories.FirstOrDefault(c => c.CategoryId == 5),
-             
+            return null;
+        }
+
+        return input.Trim().ToLowerInvariant() switch
+        {
+            "1" or "food" or "f" => "Food",
+            "2" or "transport" or "t" => "Transport",
+            "3" or "utilities" or "u" => "Utilities",
+            "4" or "entertainment" or "e" => "Entertainment",
+            "5" or "other" or "o" => "Other",
             _ => null
         };
-         
-        return matchedCategory?.CategoryName;
 
     }
 
@@ -116,7 +112,7 @@ public static class BudgetRules
         // 1. Guard clause: Throw an exception if the limit is zero or negative
         if (monthlyLimit <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(monthlyLimit), "The monthly limit must be greater than zero.");
+            throw new InvalidExpenseException("The monthly limit must be greater than zero");
         }
 
         return remaining switch
@@ -145,9 +141,13 @@ public static class BudgetRules
     /// </summary>
     public static string FormatCurrency(decimal amount, string currencySymbol)
     {
+        if (amount < 0)
+        {
+            throw new InvalidExpenseException("Amount cannot be negative for formatting");
+        }
+
         //return $"{amount:C}";
         return $"{currencySymbol}{amount:0.00}";
-        
     }
 }
 
@@ -156,3 +156,4 @@ public static class BudgetRules
 /// This one is provided complete — use it from the methods above.
 /// </summary>
 public sealed class InvalidExpenseException(string message) : Exception(message);
+ 
