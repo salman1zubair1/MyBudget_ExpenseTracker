@@ -257,7 +257,7 @@ namespace ExpenseTracker
                         break; // Exit the loop if the description is valid
                     }
                 }
-
+                string value = "";
                 // Display the expense details to the user
                 Console.WriteLine("-------------------------------------------------------------");
                 Console.WriteLine("Expense added successfully!");
@@ -302,47 +302,55 @@ namespace ExpenseTracker
         // The following method show the summery
         public static void Viewsummary()
         {
-
-            Console.WriteLine();
-            Console.WriteLine("============================================================");
-            Console.WriteLine("                          MY BUDGET                         ");
-            Console.WriteLine("                       EXPENSE SUMMARY                      ");
-            Console.WriteLine("============================================================");
-            if (expenseCount > 0)
+            try
             {
-                Console.WriteLine($"Total Count of Expenses: \t{expenseCount}");
-                Console.WriteLine($"Total Overall Spending:  \t{BudgetRules.FormatCurrency(totalExpensesAmount)}");
-                if (monthlyLimit is not 0)
-                {
-                    Console.WriteLine($"Monthly Budget: \t\t{BudgetRules.FormatCurrency(monthlyLimit)}");
-                    if (totalExpensesAmount > monthlyLimit)
-                    {
-                        Console.WriteLine("Total remaining: \t\tYour monthly expenses have exceeded your budget limit!");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Total remaining: \t\t{BudgetRules.FormatCurrency(monthlyLimit - totalExpensesAmount)}");
-                    }
-                    Console.WriteLine($"Budget Status: \t\t\t{BudgetRules.BudgetStatus((monthlyLimit - totalExpensesAmount), monthlyLimit)}");
-                }
-                Console.WriteLine($"Average: \t\t\t{BudgetRules.FormatCurrency(totalExpensesAmount / expenseCount)}");
-                Console.WriteLine($"Highest Single Expense: \t{BudgetRules.FormatCurrency(highestSingleExpense)}");
-
                 Console.WriteLine();
+                Console.WriteLine("============================================================");
+                Console.WriteLine("                          MY BUDGET                         ");
+                Console.WriteLine("                       EXPENSE SUMMARY                      ");
+                Console.WriteLine("============================================================");
+                if (expenseCount > 0)
+                {
+                    Console.WriteLine($"Total Count of Expenses: \t{expenseCount}");
+                    Console.WriteLine($"Total Overall Spending:  \t{BudgetRules.FormatCurrency(totalExpensesAmount)}");
+                    if (monthlyLimit is not 0)
+                    {
+                        Console.WriteLine($"Monthly Budget: \t\t{BudgetRules.FormatCurrency(monthlyLimit)}");
+                        if (totalExpensesAmount > monthlyLimit)
+                        {
+                            Console.WriteLine("Total remaining: \t\tYour monthly expenses have exceeded your budget limit!");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Total remaining: \t\t{BudgetRules.FormatCurrency(monthlyLimit - totalExpensesAmount)}");
+                        }
+                        Console.WriteLine($"Budget Status: \t\t\t{BudgetRules.BudgetStatus((monthlyLimit - totalExpensesAmount), monthlyLimit)}");
+                    }
+                    Console.WriteLine($"Average: \t\t\t{BudgetRules.FormatCurrency(totalExpensesAmount / expenseCount)}");
+                    Console.WriteLine($"Highest Single Expense: \t{BudgetRules.FormatCurrency(highestSingleExpense)}");
+
+                    Console.WriteLine();
+                    Console.WriteLine("-------------------------------------------------------------");
+                    Console.WriteLine("                      CATEGORY BREAKDOWN                     ");
+                    Console.WriteLine("-------------------------------------------------------------");
+                    Console.WriteLine($"Food: \t\t\t{BudgetRules.FormatCurrency(totalFood)}");
+                    Console.WriteLine($"Transport:\t\t{BudgetRules.FormatCurrency(totalTransport)}");
+                    Console.WriteLine($"Utilities:\t\t{BudgetRules.FormatCurrency(totalUtilities)}");
+                    Console.WriteLine($"Entertainment:\t\t{BudgetRules.FormatCurrency(totalEntertainment)}");
+                    Console.WriteLine($"Other: \t\t\t{BudgetRules.FormatCurrency(totalOther)}");
+                }
+                else
+                    Console.WriteLine("No expenses recorded yet."); Console.WriteLine();
                 Console.WriteLine("-------------------------------------------------------------");
-                Console.WriteLine("                      CATEGORY BREAKDOWN                     ");
-                Console.WriteLine("-------------------------------------------------------------");
-                Console.WriteLine($"Food: \t\t\t{BudgetRules.FormatCurrency(totalFood)}");
-                Console.WriteLine($"Transport:\t\t{BudgetRules.FormatCurrency(totalTransport)}");
-                Console.WriteLine($"Utilities:\t\t{BudgetRules.FormatCurrency(totalUtilities)}");
-                Console.WriteLine($"Entertainment:\t\t{BudgetRules.FormatCurrency(totalEntertainment)}");
-                Console.WriteLine($"Other: \t\t\t{BudgetRules.FormatCurrency(totalOther)}");
+                Console.WriteLine("                          THANK YOU!                         ");
+                Console.WriteLine("=============================================================");
+
             }
-            else
-                Console.WriteLine("No expenses recorded yet."); Console.WriteLine();
-            Console.WriteLine("-------------------------------------------------------------");
-            Console.WriteLine("                          THANK YOU!                         ");
-            Console.WriteLine("=============================================================");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
         }
 
         // The following method set monthly budget

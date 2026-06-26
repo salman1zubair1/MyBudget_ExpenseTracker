@@ -128,12 +128,11 @@ public static class BudgetRules
     /// Formats an amount as currency using the default "$" symbol.
     /// Implement this as an expression-bodied member that calls the overload.
     /// </summary>
+
+    //public static string DisplayBudget(decimal amount) => FormatCurrency(amount, "$");
     public static string FormatCurrency(decimal amount)
     {
-
-       return FormatCurrency(amount, "$");
-
-        
+        return FormatCurrency(amount, "$");
     }
 
     /// <summary>
