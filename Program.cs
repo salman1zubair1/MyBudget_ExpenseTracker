@@ -60,71 +60,82 @@ namespace ExpenseTracker
             bool menuContinue = true;
             while (menuContinue)
             {
-                // The following lines of code display the welcome message
-                Console.WriteLine();
-                //Console.WriteLine();
-                //Console.WriteLine("==============================================================");
-                Console.WriteLine("              Welcome to Your Financial Dashboard  ");
-                Console.WriteLine();
-
-                // The following lines of code display the main menu options to the user.
-                Console.WriteLine("1. Add an expense");
-                Console.WriteLine("2. View summary");
-                Console.WriteLine("3. Set monthly budget");
-                Console.WriteLine("4. Exit");
-
-                Console.WriteLine("==============================================================");
-
-                // The following lines of code prompt the user to select a menu option and validate the input.
-                if (int.TryParse(Console.ReadLine(), out int menuNumber))
+                try
                 {
-                    if (menuNumber < 1 || menuNumber > 5)
-                    {
-                        Console.WriteLine("Menu ID must be greater than zero and less than or equal to four. Please try again.");
-                        Console.WriteLine();
-                        continue;
+                    // The following lines of code display the welcome message
+                    Console.WriteLine();
+                    //Console.WriteLine();
+                    //Console.WriteLine("==============================================================");
+                    Console.WriteLine("              Welcome to Your Financial Dashboard  ");
+                    Console.WriteLine();
 
+                    // The following lines of code display the main menu options to the user.
+                    Console.WriteLine("1. Add an expense");
+                    Console.WriteLine("2. View summary");
+                    Console.WriteLine("3. Set monthly budget");
+                    Console.WriteLine("4. Exit");
+
+                    Console.WriteLine("==============================================================");
+
+                    // The following lines of code prompt the user to select a menu option and validate the input.
+                    if (int.TryParse(Console.ReadLine(), out int menuNumber))
+                    {
+                        if (menuNumber < 1 || menuNumber > 4)
+                        {
+                            Console.WriteLine("Menu ID must be greater than zero and less than or equal to four. Please try again.");
+                            Console.WriteLine();
+                            continue;
+
+                        }
+                        else
+                        {
+                            // The following switch statement handles the user's menu selection and calls the appropriate methods based on the selected option.
+                            switch (menuNumber)
+                            {
+                                case 1:
+                                    Console.WriteLine("You have selected: Add an expense");
+                                    AddanExpense();
+                                    break;
+                                case 2:
+                                    Console.WriteLine("You have selected: View summary");
+                                    Viewsummary();
+                                    break;
+                                case 3:
+                                    Console.WriteLine("You have selected: Set monthly budget");
+                                    Setmonthlybudget();
+                                    break;
+                                case 4:
+                                    Console.WriteLine("Exiting the application.");
+                                    Console.WriteLine("Thank you for using MyBudget. Goodbye!");
+                                    Console.WriteLine("-------------------------------------------------------------");
+                                    menuContinue = false;
+                                    break;
+                                default:
+                                    Console.WriteLine("Invalid menu selection. Please try again.");
+                                    break;
+                            }
+                        }
                     }
                     else
                     {
-                        // The following switch statement handles the user's menu selection and calls the appropriate methods based on the selected option.
-                        switch (menuNumber)
-                        {
-                            case 1:
-                                Console.WriteLine("You have selected: Add an expense");
-                                AddanExpense();
-                                break;
-                            case 2:
-                                Console.WriteLine("You have selected: View summary");
-                                Viewsummary();
-                                break;
-                            case 3:
-                                Console.WriteLine("You have selected: Set monthly budget");
-                                Setmonthlybudget();
-                                break;
-                            case 4:
-                                Console.WriteLine("Exiting the application.");
-                                Console.WriteLine("Thank you for using MyBudget. Goodbye!");
-                                Console.WriteLine("-------------------------------------------------------------");
-                                menuContinue = false;
-                                break;
-                            default:
-                                Console.WriteLine("Invalid menu selection. Please try again.");
-                                break;
-                        }
+                        Console.WriteLine("Invalid input. Please enter a valid menu number.");
+                        Console.WriteLine();
                     }
-                    //Console.WriteLine("-------------------------------------------------------------");
                 }
-                else
+                catch (InvalidExpenseException ex)
                 {
-                    Console.WriteLine("Invalid input. Please enter a valid menu number.");
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+                finally
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("-------------------------------------------------------------");
                     Console.WriteLine();
                 }
-
-                Console.WriteLine();
-                Console.WriteLine("-------------------------------------------------------------");
-                Console.WriteLine();
-                Console.WriteLine();
             }
         }
 
@@ -134,169 +145,200 @@ namespace ExpenseTracker
             bool expenseAdded = true;
             while (expenseAdded)
             {
-                string categoryInput = "";
-                decimal amountInput = 0m;
-                DateOnly DateOnlyInput = DateOnly.FromDateTime(DateTime.Now);
-                string noteInput = "";
-
-                Console.WriteLine();
-                Console.WriteLine("-------------------------------------------------------------");
-                Console.WriteLine("Please select a category from the list below:");
-                // The following lines of code display the category options to the user.
-                Console.WriteLine("1. Food");
-                Console.WriteLine("2. Transport");
-                Console.WriteLine("3. Utilities");
-                Console.WriteLine("4. Entertainment");
-                Console.WriteLine("5. Other");
-
-                Console.WriteLine("-------------------------------------------------------------");
-                Console.WriteLine("Please enter the category ID, category name or category first letter shortcut (f, t, u, e, o):");
-
-                categoryInput = BudgetRules.NormalizeCategory(Console.ReadLine());
-                if (categoryInput == null)
+                try
                 {
-                    Console.WriteLine("Invalid category input. Please try again.");
+                    string categoryInput = "";
+                    decimal amountInput = 0m;
+                    DateOnly DateOnlyInput = DateOnly.FromDateTime(DateTime.Now);
+                    string? noteInput = "";
+
                     Console.WriteLine();
-                    continue;
-                }
+                    Console.WriteLine("-------------------------------------------------------------");
+                    Console.WriteLine("Please select a category from the list below:");
+                    // The following lines of code display the category options to the user.
+                    Console.WriteLine("1. Food");
+                    Console.WriteLine("2. Transport");
+                    Console.WriteLine("3. Utilities");
+                    Console.WriteLine("4. Entertainment");
+                    Console.WriteLine("5. Other");
+                    Console.WriteLine("-------------------------------------------------------------");
+                    Console.WriteLine("Please enter the category ID, category name or category first letter shortcut (f, t, u, e, o):");
 
-
-                while (true)
-                {
-                    Console.WriteLine($"You have selected: {categoryInput}");
-
-
-                    Console.Write("Please enter the expense amount (e.g., 123.45):");
-                    string input = Console.ReadLine();
-                    if (decimal.TryParse(input, out amountInput))
+                    categoryInput = BudgetRules.NormalizeCategory(Console.ReadLine());
+                    if (categoryInput == null)
                     {
-                        try
-                        {
-                            // Validate the amount and classify it
-                            decimal validatedAmount = BudgetRules.ValidateAmount(amountInput);
-                            string classification = BudgetRules.ClassifyAmount(validatedAmount);
-                            Console.WriteLine($"Expense amount: {BudgetRules.FormatCurrency(validatedAmount)} - Classification: {classification}");
-
-                            // Update category totals and overall summary
-                            switch (categoryInput)
-                            {
-                                case "Food": totalFood += validatedAmount; break;
-                                case "Transport": totalTransport += validatedAmount; break;
-                                case "Utilities": totalUtilities += validatedAmount; break;
-                                case "Entertainment": totalEntertainment += validatedAmount; break;
-                                case "Other": totalOther += validatedAmount; break;
-                            }
-                            totalExpensesAmount += validatedAmount;
-                            expenseCount += 1;
-                            if (validatedAmount > highestSingleExpense)
-                                highestSingleExpense = validatedAmount;
-                            if (monthlyLimit is not 0)
-                            {
-                                if (totalExpensesAmount > monthlyLimit)
-                                    Console.WriteLine("Warning: You have exceeded your monthly budget limit!");
-                            }
-
-                            break; // Exit the loop if the amount is valid
-                        }
-                        catch (InvalidExpenseException ex)
-                        {
-                            Console.WriteLine($"Error: {ex.Message}. Please try again.");
-                            Console.WriteLine();
-                            continue; // Re-enter for valid input                            
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid input. Please enter a valid decimal number for the expense amount.");
+                        Console.WriteLine("Invalid category input. Please try again.");
                         Console.WriteLine();
                         continue;
                     }
-                }
 
-                while (true)
+                    while (true)
+                    {
+                        Console.WriteLine($"You have selected: {categoryInput}");
+
+                        Console.Write("Please enter the expense amount (e.g., 123.45):");
+                        string input = Console.ReadLine();
+                        if (decimal.TryParse(input, out amountInput))
+                        {
+                            try
+                            {
+                                // Validate the amount and classify it
+                                decimal validatedAmount = BudgetRules.ValidateAmount(amountInput);
+                                string classification = BudgetRules.ClassifyAmount(validatedAmount);
+                                Console.WriteLine($"Expense amount: {BudgetRules.FormatCurrency(validatedAmount)} - Classification: {classification}");
+
+                                // Update category totals and overall summary
+                                switch (categoryInput)
+                                {
+                                    case "Food": totalFood += validatedAmount; break;
+                                    case "Transport": totalTransport += validatedAmount; break;
+                                    case "Utilities": totalUtilities += validatedAmount; break;
+                                    case "Entertainment": totalEntertainment += validatedAmount; break;
+                                    case "Other": totalOther += validatedAmount; break;
+                                }
+                                totalExpensesAmount += validatedAmount;
+                                expenseCount += 1;
+                                if (validatedAmount > highestSingleExpense)
+                                    highestSingleExpense = validatedAmount;
+                                if (monthlyLimit is not 0)
+                                {
+                                    if (totalExpensesAmount > monthlyLimit)
+                                        Console.WriteLine("Warning: You have exceeded your monthly budget limit!");
+                                }
+
+                                break; // Exit the loop if the amount is valid
+                            }
+                            catch (InvalidExpenseException ex)
+                            {
+                                Console.WriteLine($"Error: {ex.Message}. Please try again.");
+                                continue; // Re-enter for valid input                            
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error: {ex.Message}. Please try again.");
+                                continue;
+                            }
+                            finally { Console.WriteLine(); }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input. Please enter a valid decimal number for the expense amount.");
+                            Console.WriteLine();
+                            continue;
+                        }
+                    }
+
+                    while (true)
+                    {
+
+                        Console.WriteLine("Enter yyyy-MM-dd for past dates. Do not enter future dates. Leave blank for today");
+
+                        string inputDate = Console.ReadLine();
+                        if (string.IsNullOrWhiteSpace(inputDate))
+                        {
+                            DateOnlyInput = DateOnly.FromDateTime(DateTime.Now);
+                            Console.WriteLine("Expense date recorded: " + DateOnlyInput.ToString("yyyy-MM-dd"));
+                            break;// Exit the loop if the date is valid
+                        }
+                        else if (DateOnly.TryParse(inputDate, out DateOnly outDate) && (outDate <= DateOnly.FromDateTime(DateTime.Now)))
+                        {
+                            DateOnlyInput = outDate;
+                            Console.WriteLine("Expense date recorded: " + DateOnlyInput.ToString("yyyy-MM-dd"));
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input. Please enter a valid date.");
+                            Console.WriteLine();
+                            continue;// Re-enter for valid input
+                        }
+                    }
+                    while (true)
+                    {
+                        Console.WriteLine("Please enter a note for the expense (optional, max 100 characters):");
+                        noteInput = Console.ReadLine();// Read the note input from the user
+
+
+                        if (noteInput.Length > 100)
+                        {
+                            Console.WriteLine("Description is too long. Please limit to 100 characters.");
+                            Console.WriteLine();
+                            continue;// Re-enter for valid input
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Expense description recorded: {noteInput}");
+                            break; // Exit the loop if the description is valid
+                        }
+                    }
+                    string value = "";
+                    // Display the expense details to the user
+                    Console.WriteLine("-------------------------------------------------------------");
+                    Console.WriteLine("Expense added successfully!");
+                    Console.WriteLine();
+                    Console.WriteLine("You have added the following expense now:");
+                    Console.WriteLine("-------------------------------------------------------------");
+                    Console.WriteLine($"Category: {categoryInput}");
+                    Console.WriteLine($"Amount: {BudgetRules.FormatCurrency(BudgetRules.ValidateAmount(amountInput))} - Classification: {BudgetRules.ClassifyAmount(BudgetRules.ValidateAmount(amountInput))}");
+                    Console.WriteLine($"Date: {DateOnlyInput.ToString("yyyy-MM-dd")}");
+                    if (!string.IsNullOrWhiteSpace(noteInput))
+                    {
+                        Console.WriteLine($"Note: {noteInput}");
+                    }
+
+                    Console.WriteLine("-------------------------------------------------------------");
+                    if (monthlyLimit is not 0)
+                    {
+                        decimal remainingAmount = monthlyLimit - totalExpensesAmount;
+                        if (remainingAmount < 0)
+                        {
+                            decimal OverBudgetRemainingAmount = Math.Abs(remainingAmount);
+                            Console.WriteLine($"Budget: {BudgetRules.FormatCurrency(OverBudgetRemainingAmount)} OVER BUDGET " +
+                                              $"of your {BudgetRules.FormatCurrency(monthlyLimit)} limit! -> " +
+                                              $"{BudgetRules.BudgetStatus(remainingAmount, monthlyLimit)}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Budget: {BudgetRules.FormatCurrency(remainingAmount)} " +
+                            $"remaining of {BudgetRules.FormatCurrency(monthlyLimit)} -> " +
+                            $"{BudgetRules.BudgetStatus((monthlyLimit - totalExpensesAmount), monthlyLimit)}");
+                        }
+                        Console.WriteLine("-------------------------------------------------------------");
+                    }
+                    Console.WriteLine();
+                    while (true)
+                    {
+                        Console.WriteLine("Would you like to add another expense? (y/n):");
+                        string continueInput = Console.ReadLine().Trim().ToLower();
+                        if (continueInput == "y")
+                        {
+                            break; // Exit the inner loop to add another expense
+                        }
+                        else if (continueInput == "n")
+                        {
+                            expenseAdded = false; // Exit the outer loop to return to the main menu
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input. Please enter 'y' for yes or 'n' for no.");
+                            Console.WriteLine();
+                            continue; // Re-enter for valid input 
+                        }
+                    }
+                }
+                catch (InvalidExpenseException ex)
                 {
-
-                    Console.WriteLine("Enter yyyy-MM-dd for past / today dates. Do not enter future dates. Leave blank for today");
-
-                    string inputDate = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(inputDate))
-                    {
-                        DateOnlyInput = DateOnly.FromDateTime(DateTime.Now);
-                        Console.WriteLine("Expense date recorded: " + DateOnlyInput.ToString("yyyy-MM-dd"));
-                        break;// Exit the loop if the date is valid
-                    }
-                    else if (DateOnly.TryParse(inputDate, out DateOnly outDate) && (outDate <= DateOnly.FromDateTime(DateTime.Now)))
-                    {
-                        DateOnlyInput = outDate;
-                        Console.WriteLine("Expense date recorded: " + DateOnlyInput.ToString("yyyy-MM-dd"));
-                        break;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid input. Please enter a valid date.");
-                        Console.WriteLine();
-                        continue;// Re-enter for valid input
-                    }
+                    Console.WriteLine($"Error: {ex.Message}. Please try again.");
+                    continue; // Re-enter for valid input                            
                 }
-
-                while (true)
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Please enter a note for the expense (optional, max 100 characters):");
-                    noteInput = Console.ReadLine();// Read the note input from the user
-
-
-                    if (noteInput.Length > 100)
-                    {
-                        Console.WriteLine("Description is too long. Please limit to 100 characters.");
-                        Console.WriteLine();
-                        continue;// Re-enter for valid input
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Expense description recorded: {noteInput}");
-                        break; // Exit the loop if the description is valid
-                    }
+                    Console.WriteLine($"Error: {ex.Message}. Please try again.");
+                    continue;
                 }
-                string value = "";
-                // Display the expense details to the user
-                Console.WriteLine("-------------------------------------------------------------");
-                Console.WriteLine("Expense added successfully!");
-                Console.WriteLine();
-                Console.WriteLine("You have added the following expense now:");
-                Console.WriteLine("-------------------------------------------------------------");
-                Console.WriteLine($"Category: {categoryInput}");
-                Console.WriteLine($"Amount: {BudgetRules.FormatCurrency(BudgetRules.ValidateAmount(amountInput))} - Classification: {BudgetRules.ClassifyAmount(BudgetRules.ValidateAmount(amountInput))}");
-                Console.WriteLine($"Date: {DateOnlyInput.ToString("yyyy-MM-dd")}");
-                if (!string.IsNullOrWhiteSpace(noteInput))
-                {
-                    Console.WriteLine($"Note: {noteInput}");
-                }
-                Console.WriteLine("-------------------------------------------------------------");
-                Console.WriteLine();
-                while (true)
-                {
-                    Console.WriteLine("Would you like to add another expense? (y/n):");
-                    string continueInput = Console.ReadLine().Trim().ToLower();
-                    if (continueInput == "y")
-                    {
-                        break; // Exit the inner loop to add another expense
-                    }
-                    else if (continueInput == "n")
-                    {
-                        expenseAdded = false; // Exit the outer loop to return to the main menu
-                        break;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid input. Please enter 'y' for yes or 'n' for no.");
-                        Console.WriteLine();
-                        continue; // Re-enter for valid input 
-                    }
-                }
+                finally { Console.WriteLine(); }
             }
-
-
-
         }
 
         // The following method show the summery
@@ -316,13 +358,17 @@ namespace ExpenseTracker
                     if (monthlyLimit is not 0)
                     {
                         Console.WriteLine($"Monthly Budget: \t\t{BudgetRules.FormatCurrency(monthlyLimit)}");
+                        decimal remainingAmount = monthlyLimit - totalExpensesAmount;
                         if (totalExpensesAmount > monthlyLimit)
                         {
-                            Console.WriteLine("Total remaining: \t\tYour monthly expenses have exceeded your budget limit!");
+                            decimal OverBudgetRemainingAmount = Math.Abs(remainingAmount);
+
+                            Console.WriteLine($"Total remaining: \t\t{BudgetRules.FormatCurrency(OverBudgetRemainingAmount)} OVER BUDGET\nYour monthly expenses have exceeded your budget limit!");
+                            Console.WriteLine();
                         }
                         else
                         {
-                            Console.WriteLine($"Total remaining: \t\t{BudgetRules.FormatCurrency(monthlyLimit - totalExpensesAmount)}");
+                            Console.WriteLine($"Total remaining: \t\t{BudgetRules.FormatCurrency(remainingAmount)}");
                         }
                         Console.WriteLine($"Budget Status: \t\t\t{BudgetRules.BudgetStatus((monthlyLimit - totalExpensesAmount), monthlyLimit)}");
                     }
@@ -346,11 +392,18 @@ namespace ExpenseTracker
                 Console.WriteLine("=============================================================");
 
             }
+            catch (InvalidExpenseException ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
-
+            finally
+            {
+                Console.WriteLine("");
+            }
         }
 
         // The following method set monthly budget
@@ -371,15 +424,21 @@ namespace ExpenseTracker
                         break;
                     }
                 }
+                catch (InvalidExpenseException ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error: {ex.Message}");
                 }
+                finally
+                {
+                    Console.WriteLine("");
+                }
             }
         }
     }
-
-
 }
 
 
